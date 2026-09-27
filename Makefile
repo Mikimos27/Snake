@@ -10,7 +10,7 @@ a.out: $(SRCS) $(HDRS)
 	$(CXX) $(CXXFLAGS) -o $@ $(SRCS)
 
 
-.PHONY: clean remake val mem
+.PHONY: clean remake val mem open
 
 clean:
 	rm -f $(BIN)
@@ -22,3 +22,6 @@ mem: $(SRCS) $(HDRS)
 
 val: $(BIN)
 	valgrind --tool=memcheck --leak-check=yes --show-leak-kinds=all --track-origins=yes --log-file=vgr-out.txt -s ./$(BIN)
+
+open: $(BIN)
+	./$(BIN)
