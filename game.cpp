@@ -45,12 +45,18 @@ void game::start(uint16_t time){
         //printdbg(headx);
         //printdbg(heady);
         //printdbg(direction);
+        printdbg(appxdbg);
+        printdbg(appydbg);
         printdbg(score);
         if(gameover){
             return;
         }
         napms(time);
     }
+}
+
+uint16_t game::get_score() const{
+    return score;
 }
 
 void game::draw() const{
@@ -141,9 +147,10 @@ void game::move(enum DIRECTION newdir){
     }
     if(board[heady][headx] == -1) {
         score_to_add++;
+        board[heady][headx] = score + 1;
         place_apple();
     }
-    board[heady][headx] = score + 1;
+    else board[heady][headx] = score + 1;
 }
 
 enum game::DIRECTION game::getdir(){
@@ -168,8 +175,10 @@ void game::place_apple(){
     uint16_t pos = std::rand() % available;
     for(uint16_t i = 0; i < bsize; i++){
         for(uint16_t j = 0; j < bsize; j++){
-            if(pos == 0) {
+            if(pos == 0 && board[i][j] == 0) {
                 board[i][j] = -1;
+                appxdbg = j;
+                appydbg = i;
                 return;
             }
             if(board[i][j] == 0) pos--;

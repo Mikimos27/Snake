@@ -9,6 +9,7 @@ public:
     ~game();
 
     void start(uint16_t time);
+    uint16_t get_score() const;
 private:
     enum DIRECTION{
         UP = 0,
@@ -33,6 +34,9 @@ private:
     uint16_t heady;
     enum DIRECTION direction;
     bool gameover = 0;
+
+    uint16_t appxdbg = 0;
+    uint16_t appydbg = 0;
 };
 
 #endif
