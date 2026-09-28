@@ -22,3 +22,7 @@ Options file:
  4. hide walls (bool)
  5. loop on death (bool)
  6. pause on start (bool)
+
+Game:
+ - Arrows to change direction
+ - 'p' to pause
