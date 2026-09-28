@@ -9,6 +9,7 @@ public:
     ~game();
 
     void start(uint16_t time);
+    void reset();
     uint16_t get_score() const;
 private:
     enum DIRECTION{
@@ -21,7 +22,14 @@ private:
     struct Cell{
         uint16_t val = 0;
         bool is_vertical = true;
+        bool is_corner = false;
         bool has_apple = false;
+        void reset(){
+            val = 0;
+            is_vertical = true;
+            is_corner = false;
+            has_apple = false;
+        }
     };
     void draw() const;
     void regress();

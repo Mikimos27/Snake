@@ -20,6 +20,7 @@ void init_getch(){
 
 game::game(uint16_t n, bool wrap, bool hidewalls)
     : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), direction(DOWN), wrap(wrap), hidewalls(hidewalls) {
+    std::srand(std::time(NULL));
     if(!board) exit(1);
     for(uint8_t i = 0; i < n; i++){
         board[i] = new Cell[n];
@@ -36,7 +37,6 @@ game::~game(){
 }
 
 void game::start(uint16_t time){
-    std::srand(std::time(NULL));
     place_apple();
     for(;;){
         if(!wrap) move(getdir());
@@ -60,6 +60,17 @@ void game::start(uint16_t time){
     }
 }
 
+void game::reset(){
+    score = 0;
+    score_to_add = 0;
+    gameover = false;
+    headx = bsize / 2;
+    heady = bsize / 2;
+    for(uint16_t i = 0; i < bsize; i++)
+        for(uint16_t j = 0; j < bsize; j++)
+            board[i][j].reset();
+}
+
 uint16_t game::get_score() const{
     return score;
 }
@@ -79,7 +90,9 @@ void game::draw() const{
                     c = ' ';
                     break;
                 default:
-                    if(board[i][j].is_vertical)
+                    if(board[i][j].is_corner)
+                        c = ':';
+                    else if(board[i][j].is_vertical)
                         c = '|';
                     else c = '=';
             }
@@ -107,7 +120,11 @@ void game::regress(){
 }
 
 void game::move(enum DIRECTION newdir){
-    if(abs((int)direction - (int)newdir) != 2) direction = newdir;
+    bool changeddir = false;
+    if(abs((int)direction - (int)newdir) != 2 && direction != newdir){
+        direction = newdir;
+        changeddir = true;
+    }
     switch(direction){
         case UP:
             if(heady == 0 || board[heady - 1][headx].val > 0) {
@@ -136,6 +153,7 @@ void game::move(enum DIRECTION newdir){
     }
 
 
+    board[heady][headx].is_corner = changeddir;
     bool will_be_vertical = true;
     switch(direction){
         case UP:
@@ -155,21 +173,25 @@ void game::move(enum DIRECTION newdir){
         default:
             break;
     }
+    board[heady][headx].is_vertical = will_be_vertical;
+    
     if(board[heady][headx].has_apple) {
         score_to_add++;
         board[heady][headx].val = score + 2;
-        board[heady][headx].is_vertical = will_be_vertical;
         board[heady][headx].has_apple = false;
         place_apple();
     }
     else {
         board[heady][headx].val = score + 1;
-        board[heady][headx].is_vertical = will_be_vertical;
     }
 }
 
 void game::move_wrapped(enum DIRECTION newdir){
-    if(abs((int)direction - (int)newdir) != 2) direction = newdir;
+    bool changeddir = false;
+    if(abs((int)direction - (int)newdir) != 2 && direction != newdir){
+        direction = newdir;
+        changeddir = true;
+    }
     switch(direction){
         case UP:
             if(board[(heady - 1 + bsize) % bsize][headx].val > 0) {
@@ -198,6 +220,7 @@ void game::move_wrapped(enum DIRECTION newdir){
     }
 
 
+    board[heady][headx].is_corner = changeddir;
     bool will_be_vertical = true;
     switch(direction){
         case UP:
@@ -221,16 +244,15 @@ void game::move_wrapped(enum DIRECTION newdir){
         default:
             break;
     }
+    board[heady][headx].is_vertical = will_be_vertical;
     if(board[heady][headx].has_apple) {
         score_to_add++;
         board[heady][headx].val = score + 2;
-        board[heady][headx].is_vertical = will_be_vertical;
         board[heady][headx].has_apple = false;
         place_apple();
     }
     else {
         board[heady][headx].val = score + 1;
-        board[heady][headx].is_vertical = will_be_vertical;
     }
 }
 
