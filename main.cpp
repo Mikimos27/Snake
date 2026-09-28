@@ -6,7 +6,7 @@
 
 
 int main(int argc, char** argv){
-    std::string filename = "options.ini";
+    std::string filename = "options.cfg";
     if(argc > 1){
         filename = argv[1];
     }
