@@ -18,8 +18,8 @@ void init_getch(){
     keypad(stdscr, TRUE);
 }
 
-game::game(uint16_t n)
-    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), direction(DOWN) {
+game::game(uint16_t n, bool wrap, bool hidewalls)
+    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), direction(DOWN), wrap(wrap), hidewalls(hidewalls) {
     if(!board) exit(1);
     for(uint8_t i = 0; i < n; i++){
         board[i] = new Cell[n];
@@ -39,7 +39,8 @@ void game::start(uint16_t time){
     std::srand(std::time(NULL));
     place_apple();
     for(;;){
-        move(getdir());
+        if(!wrap) move(getdir());
+        else move_wrapped(getdir());
         regress();
         //printdbg(headx);
         //printdbg(heady);
@@ -68,7 +69,9 @@ void game::draw() const{
     for(int16_t i = -1; i <= bsize; i++){
         for(int16_t j = -1; j <= bsize; j++){
             char c = ' ';
-            if(i == -1 || i == bsize || j == -1 || j == bsize){ c = 'W'; }
+            if(i == -1 || i == bsize || j == -1 || j == bsize){
+                c = hidewalls ? ' ' : 'W'; 
+            }
             else if(j == headx && i == heady){ c = 'H'; }
             else if(board[i][j].has_apple) c = 'A';
             else switch(board[i][j].val){
@@ -147,6 +150,72 @@ void game::move(enum DIRECTION newdir){
             break;
         case RIGHT:
             headx++;
+            will_be_vertical = false;
+            break;
+        default:
+            break;
+    }
+    if(board[heady][headx].has_apple) {
+        score_to_add++;
+        board[heady][headx].val = score + 2;
+        board[heady][headx].is_vertical = will_be_vertical;
+        board[heady][headx].has_apple = false;
+        place_apple();
+    }
+    else {
+        board[heady][headx].val = score + 1;
+        board[heady][headx].is_vertical = will_be_vertical;
+    }
+}
+
+void game::move_wrapped(enum DIRECTION newdir){
+    if(abs((int)direction - (int)newdir) != 2) direction = newdir;
+    switch(direction){
+        case UP:
+            if(board[(heady - 1 + bsize) % bsize][headx].val > 0) {
+                gameover = 1; return;
+            }
+            break;
+        case LEFT:
+            if(board[heady][(headx - 1 + bsize) % bsize].val > 0) {
+                gameover = 1; return;
+            }
+            break;
+        case DOWN:
+            if(board[(heady + 1) % bsize][headx].val > 0){
+                gameover = 1;
+                return;
+            }
+            break;
+        case RIGHT:
+            if(board[heady][(headx + 1) % bsize].val > 0){
+                gameover = 1;
+                return;
+            }
+            break;
+        default:
+            break;
+    }
+
+
+    bool will_be_vertical = true;
+    switch(direction){
+        case UP:
+            if(heady == 0) heady += bsize;
+            heady--;
+            break;
+        case LEFT:
+            if(headx == 0) headx += bsize;
+            headx--;
+            will_be_vertical = false;
+            break;
+        case DOWN:
+            heady++;
+            if(heady == bsize) heady = 0;
+            break;
+        case RIGHT:
+            headx++;
+            if(headx == bsize) headx = 0;
             will_be_vertical = false;
             break;
         default:

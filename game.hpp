@@ -5,7 +5,7 @@
 
 class game{
 public:
-    game(uint16_t);
+    game(uint16_t, bool, bool);
     ~game();
 
     void start(uint16_t time);
@@ -26,6 +26,7 @@ private:
     void draw() const;
     void regress();
     void move(enum DIRECTION newdir);
+    void move_wrapped(enum DIRECTION newdir);
     enum DIRECTION getdir();
     void place_apple();
     
@@ -38,7 +39,9 @@ private:
     uint16_t headx;
     uint16_t heady;
     enum DIRECTION direction;
-    bool gameover = 0;
+    bool gameover = false;
+    bool wrap;
+    bool hidewalls;
 
     uint16_t appxdbg = 0;
     uint16_t appydbg = 0;
