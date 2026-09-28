@@ -63,7 +63,6 @@ void game::start(uint16_t time){
         //println("Headx: %u\n", headx);
         draw();
         if(gameover) return;
-        getdir();
         napms(time);
         while(paused){
             if(getch() == 'p') paused = false;
@@ -283,7 +282,7 @@ void game::move_wrapped(enum DIRECTION newdir){
 
 enum game::DIRECTION game::getdir(){
     auto c = getch();
-    flushinp();
+    if(c == ERR) return direction;
     switch(c){
         case KEY_UP:
             return UP;
