@@ -65,7 +65,8 @@ void game::start(uint16_t time){
         if(gameover) return;
         napms(time);
         while(paused){
-            if(getch() == 'p') paused = false;
+            char c = getch();
+            if(c == 'p' || c == 'P') paused = false;
         }
     }
 }
@@ -287,15 +288,30 @@ enum game::DIRECTION game::getdir(){
     if(c == ERR) return direction;
     switch(c){
         case KEY_UP:
+        case 'w':
+        case 'W':
             return UP;
         case KEY_DOWN:
+        case 's':
+        case 'S':
             return DOWN;
         case KEY_LEFT:
+        case 'a':
+        case 'A':
             return LEFT;
         case KEY_RIGHT:
+        case 'd':
+        case 'D':
             return RIGHT;
         case 'p':
+        case 'P':
             paused = true;
+            break;
+        case 'q':
+        case 'Q':
+            gameover = true;
+            break;
+
     }
     return direction;
 }
