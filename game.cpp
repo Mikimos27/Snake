@@ -243,6 +243,8 @@ void game::move_wrapped(enum DIRECTION newdir){
             break;
     }
 
+    prevheadx = headx;
+    prevheady = heady;
 
     board[heady][headx].is_corner = changeddir;
     bool will_be_vertical = true;
