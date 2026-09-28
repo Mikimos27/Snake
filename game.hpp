@@ -33,7 +33,7 @@ private:
     };
     void drawstart() const;
     void draw() const;
-    void draw_xy(int x, int y, char c) const;
+    void draw_xy(int x, int y, unsigned int c) const;
     void println(const char*, uint16_t);
     void regress();
     void move(enum DIRECTION newdir);

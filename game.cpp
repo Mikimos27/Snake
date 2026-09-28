@@ -5,12 +5,21 @@
 #include <ctime>
 
 #define printdbg(A) printw("%s = %u\n", #A, A)
+#define COLOR_WALL COLOR_PAIR(1)
+#define COLOR_APPLE COLOR_PAIR(2)
+#define COLOR_SNAKEHEAD COLOR_PAIR(3)
+#define COLOR_SNAKETAIL COLOR_PAIR(4)
 
 template<typename T>
 T abs(T a) { return a >= 0 ? a : -a; }
 
 void init_getch(){
     initscr();
+    start_color();
+    init_pair(1, COLOR_WHITE, COLOR_WHITE);
+    init_pair(2, COLOR_RED, COLOR_RED);
+    init_pair(3, COLOR_CYAN, COLOR_CYAN);
+    init_pair(4, COLOR_CYAN, COLOR_BLACK);
     cbreak();
     noecho();
     scrollok(stdscr, TRUE);
@@ -81,7 +90,11 @@ void game::drawstart() const{
     if(!hidewalls)
         for(int16_t i = -1; i <= bsize; i++){
             for(int16_t j = -1; j <= bsize; j++){
-                if(j == -1 || j == bsize || i == -1 || i == bsize) printw("WW");
+                if(j == -1 || j == bsize || i == -1 || i == bsize) {
+                    attron(COLOR_WALL);
+                    printw("WW");
+                    attroff(COLOR_WALL);
+                }
                 else printw("  ");
             }
             printw("\n");
@@ -91,13 +104,13 @@ void game::drawstart() const{
     refresh();
 }
 
-void game::draw_xy(int x, int y, char c) const {
+void game::draw_xy(int x, int y, unsigned int c) const {
     mvaddch(y + 1, 2 * x + 2, c);
     mvaddch(y + 1, 2 * x + 3, c);
 }
 
 void game::draw() const{
-    draw_xy(headx, heady, 'H');
+    draw_xy(headx, heady, 'H' | COLOR_SNAKEHEAD);
     auto& ccell = board[prevheady][prevheadx];
     char c = ' ';
     if(ccell.val > 0){
@@ -105,7 +118,7 @@ void game::draw() const{
         if(ccell.is_corner) c = ':';
         else if (ccell.is_vertical) c = '|';
     }
-    draw_xy(prevheadx, prevheady, c);
+    draw_xy(prevheadx, prevheady, c | COLOR_SNAKETAIL);
     refresh();
 }
 
@@ -301,7 +314,7 @@ void game::place_apple(){
                 board[i][j].has_apple = true;
                 appxdbg = j;
                 appydbg = i;
-                draw_xy(appxdbg, appydbg, 'A');
+                draw_xy(appxdbg, appydbg, 'A' | COLOR_APPLE);
                 return;
             }
             if(board[i][j].val == 0) pos--;
