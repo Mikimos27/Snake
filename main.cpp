@@ -16,6 +16,7 @@ int main(int argc, char** argv){
     bool wrap = false;
     bool hidewalls = false;
     bool loopondeath = false;
+    bool startpaused = false;
     std::ifstream file(filename);
     if(file){
         uint16_t out = 0;
@@ -24,6 +25,7 @@ int main(int argc, char** argv){
         if(file >> out) wrap = out;
         if(file >> out) hidewalls = out;
         if(file >> out) loopondeath = out;
+        if(file >> out) startpaused = out;
     } else{
         file.close();
         std::ofstream makefile(filename);
@@ -32,10 +34,11 @@ int main(int argc, char** argv){
         makefile << wrap << '\n';
         makefile << hidewalls << '\n';
         makefile << loopondeath << '\n';
+        makefile << startpaused << '\n';
     }
 
     {
-        game g(width, wrap, hidewalls);
+        game g(width, wrap, hidewalls, startpaused);
         do{
             g.start(timems);
             if(loopondeath){

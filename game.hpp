@@ -5,7 +5,7 @@
 
 class game{
 public:
-    game(uint16_t, bool, bool);
+    game(uint16_t, bool, bool, bool);
     ~game();
 
     void start(uint16_t time);
@@ -44,7 +44,7 @@ private:
 
 private:
     Cell** board;
-    uint16_t bsize;
+    const uint16_t bsize;
     uint16_t score;
     uint16_t score_to_add;
     uint16_t headx;
@@ -53,8 +53,10 @@ private:
     uint16_t prevheady;
     enum DIRECTION direction;
     bool gameover = false;
-    bool wrap;
-    bool hidewalls;
+    const bool wrap;
+    const bool hidewalls;
+
+    bool paused;
 
     uint16_t appxdbg = 0;
     uint16_t appydbg = 0;

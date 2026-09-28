@@ -19,8 +19,8 @@ void init_getch(){
     curs_set(0);
 }
 
-game::game(uint16_t n, bool wrap, bool hidewalls)
-    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), prevheadx(headx), prevheady(heady), direction(DOWN), wrap(wrap), hidewalls(hidewalls) {
+game::game(uint16_t n, bool wrap, bool hidewalls, bool paused)
+    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), prevheadx(headx), prevheady(heady), direction(DOWN), wrap(wrap), hidewalls(hidewalls), paused(paused) {
     std::srand(std::time(NULL));
     if(!board) exit(1);
     for(uint8_t i = 0; i < n; i++){
@@ -54,7 +54,11 @@ void game::start(uint16_t time){
         //println("Headx: %u\n", headx);
         draw();
         if(gameover) return;
+        getdir();
         napms(time);
+        while(paused){
+            if(getch() == 'p') paused = false;
+        }
     }
 }
 
@@ -276,6 +280,8 @@ enum game::DIRECTION game::getdir(){
             return LEFT;
         case KEY_RIGHT:
             return RIGHT;
+        case 'p':
+            paused = true;
     }
     return direction;
 }
