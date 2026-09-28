@@ -18,6 +18,11 @@ private:
         RIGHT = 3,
         INVALID = 20
     };
+    struct Cell{
+        uint16_t val = 0;
+        bool is_vertical = true;
+        bool has_apple = false;
+    };
     void draw() const;
     void regress();
     void move(enum DIRECTION newdir);
@@ -26,7 +31,7 @@ private:
     
 
 private:
-    int16_t** board;
+    Cell** board;
     uint16_t bsize;
     uint16_t score;
     uint16_t score_to_add;
