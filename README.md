@@ -20,3 +20,4 @@ Options file:
  2. frame time (ms)
  3. wall colision (bool)
  4. hide walls (bool)
+ 5. loop on death (bool)
