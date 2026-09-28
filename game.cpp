@@ -16,10 +16,11 @@ void init_getch(){
     scrollok(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     keypad(stdscr, TRUE);
+    curs_set(0);
 }
 
 game::game(uint16_t n, bool wrap, bool hidewalls)
-    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), direction(DOWN), wrap(wrap), hidewalls(hidewalls) {
+    : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), prevheadx(headx), prevheady(heady), direction(DOWN), wrap(wrap), hidewalls(hidewalls) {
     std::srand(std::time(NULL));
     if(!board) exit(1);
     for(uint8_t i = 0; i < n; i++){
@@ -36,26 +37,23 @@ game::~game(){
     endwin();
 }
 
+void game::println(const char* str, uint16_t val){
+    mvaddch(bsize + 2, 0, ' ');
+    printw(str, val);
+}
+
 void game::start(uint16_t time){
+    drawstart();
     place_apple();
     for(;;){
         if(!wrap) move(getdir());
         else move_wrapped(getdir());
         regress();
-        //printdbg(headx);
-        //printdbg(heady);
-        //printdbg(direction);
-        //printdbg(appxdbg);
-        //printdbg(appydbg);
-        //printdbg(board[appydbg][appxdbg].has_apple);
-        printdbg(score);
+        //printdbg(score);
+        println("Score: %u\n", score);
+        //println("Headx: %u\n", headx);
         draw();
-        //if(headx == appxdbg && heady == appydbg) pause = true;
-        //printdbg(pause);
-        //while(pause);
-        if(gameover){
-            return;
-        }
+        if(gameover) return;
         napms(time);
     }
 }
@@ -74,34 +72,37 @@ void game::reset(){
 uint16_t game::get_score() const{
     return score;
 }
+void game::drawstart() const{
+    clear();
+    if(!hidewalls)
+        for(int16_t i = -1; i <= bsize; i++){
+            for(int16_t j = -1; j <= bsize; j++){
+                if(j == -1 || j == bsize || i == -1 || i == bsize) printw("WW");
+                else printw("  ");
+            }
+            printw("\n");
+        }
+    //draw_xy(headx, heady, 'H');
+    printw("\n");
+    refresh();
+}
+
+void game::draw_xy(int x, int y, char c) const {
+    mvaddch(y + 1, 2 * x + 2, c);
+    mvaddch(y + 1, 2 * x + 3, c);
+}
 
 void game::draw() const{
-    //printw("\033[2J\033[1;1H");
-    for(int16_t i = -1; i <= bsize; i++){
-        for(int16_t j = -1; j <= bsize; j++){
-            char c = ' ';
-            if(i == -1 || i == bsize || j == -1 || j == bsize){
-                c = hidewalls ? ' ' : 'W'; 
-            }
-            else if(j == headx && i == heady){ c = 'H'; }
-            else if(board[i][j].has_apple) c = 'A';
-            else switch(board[i][j].val){
-                case 0:
-                    c = ' ';
-                    break;
-                default:
-                    if(board[i][j].is_corner)
-                        c = ':';
-                    else if(board[i][j].is_vertical)
-                        c = '|';
-                    else c = '=';
-            }
-            printw("%c%c", c, c);
-        }
-        printw("\n");
+    draw_xy(headx, heady, 'H');
+    auto& ccell = board[prevheady][prevheadx];
+    char c = ' ';
+    if(ccell.val > 0){
+        c = '=';
+        if(ccell.is_corner) c = ':';
+        else if (ccell.is_vertical) c = '|';
     }
+    draw_xy(prevheadx, prevheady, c);
     refresh();
-    clear();
 }
 
 void game::regress(){
@@ -112,8 +113,13 @@ void game::regress(){
     }
     for(uint8_t i = 0; i < bsize; i++){
         for(uint8_t j = 0; j < bsize; j++){
-            if(board[i][j].val <= 0) continue;
+            if(board[i][j].has_apple) continue;
             if(i == heady && j == headx) continue;
+            if(board[i][j].val <= 1) {
+                draw_xy(j, i, ' ');
+                board[i][j].val = 0;
+                continue;
+            }
             board[i][j].val--;
         }
     }
@@ -152,6 +158,8 @@ void game::move(enum DIRECTION newdir){
             break;
     }
 
+    prevheadx = headx;
+    prevheady = heady;
 
     board[heady][headx].is_corner = changeddir;
     bool will_be_vertical = true;
@@ -287,6 +295,7 @@ void game::place_apple(){
                 board[i][j].has_apple = true;
                 appxdbg = j;
                 appydbg = i;
+                draw_xy(appxdbg, appydbg, 'A');
                 return;
             }
             if(board[i][j].val == 0) pos--;

@@ -31,7 +31,10 @@ private:
             has_apple = false;
         }
     };
+    void drawstart() const;
     void draw() const;
+    void draw_xy(int x, int y, char c) const;
+    void println(const char*, uint16_t);
     void regress();
     void move(enum DIRECTION newdir);
     void move_wrapped(enum DIRECTION newdir);
@@ -46,6 +49,8 @@ private:
     uint16_t score_to_add;
     uint16_t headx;
     uint16_t heady;
+    uint16_t prevheadx;
+    uint16_t prevheady;
     enum DIRECTION direction;
     bool gameover = false;
     bool wrap;
