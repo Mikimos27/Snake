@@ -4,13 +4,17 @@
 #include <cstdint>
 
 
-int main(void){
+int main(int argc, char** argv){
+    std::string filename = "options.ini";
+    if(argc > 1){
+        filename = argv[1];
+    }
     uint16_t score = 0;
     uint16_t width = 32;
     uint16_t timems = 180;
     bool wrap = false;
     bool hidewalls = false;
-    std::ifstream file("options.ini");
+    std::ifstream file(filename);
     if(file){
         uint16_t out = 0;
         bool outb = false;
