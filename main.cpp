@@ -41,14 +41,9 @@ int main(int argc, char** argv){
         game g(width, wrap, hidewalls, startpaused);
         do{
             g.start(timems);
-            if(loopondeath){
-                score = g.get_score();
-                if(score == width * width - 1){
-                    std::cout << "WIN\n";
-                    return 0;
-                }
-                g.reset();
-            }else break;
+            score = g.get_score();
+            if(loopondeath) g.reset();
+            else break;
         }while(1);
     }
     std::cout << "Score: " << score << '\n';
