@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdint>
+#include <string>
 
 
 int main(int argc, char** argv){
@@ -10,7 +11,7 @@ int main(int argc, char** argv){
         filename = argv[1];
     }
     uint16_t score = 0;
-    uint16_t width = 32;
+    uint16_t width = 16;
     uint16_t timems = 180;
     bool wrap = false;
     bool hidewalls = false;
@@ -23,6 +24,14 @@ int main(int argc, char** argv){
         if(file >> out) wrap = out;
         if(file >> out) hidewalls = out;
         if(file >> out) loopondeath = out;
+    } else{
+        file.close();
+        std::ofstream makefile(filename);
+        makefile << width << '\n';
+        makefile << timems << '\n';
+        makefile << wrap << '\n';
+        makefile << hidewalls << '\n';
+        makefile << loopondeath << '\n';
     }
 
     {
