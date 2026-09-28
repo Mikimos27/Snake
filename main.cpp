@@ -38,8 +38,12 @@ int main(int argc, char** argv){
         game g(width, wrap, hidewalls);
         do{
             g.start(timems);
-            score = g.get_score();
             if(loopondeath){
+                score = g.get_score();
+                if(score == width * width - 1){
+                    std::cout << "WIN\n";
+                    return 0;
+                }
                 g.reset();
             }else break;
         }while(1);
