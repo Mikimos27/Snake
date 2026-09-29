@@ -9,6 +9,8 @@
 #define COLOR_APPLE COLOR_PAIR(2)
 #define COLOR_SNAKEHEAD COLOR_PAIR(3)
 #define COLOR_SNAKETAIL COLOR_PAIR(4)
+#define COLOR_EMPTY COLOR_PAIR(5)
+#define EMPTY_CHAR ' '
 
 template<typename T>
 T abs(T a) { return a >= 0 ? a : -a; }
@@ -20,6 +22,7 @@ void init_getch(){
     init_pair(2, COLOR_RED, COLOR_RED);
     init_pair(3, COLOR_CYAN, COLOR_CYAN);
     init_pair(4, COLOR_CYAN, COLOR_BLACK);
+    init_pair(5, COLOR_WHITE, COLOR_BLACK);
     cbreak();
     noecho();
     scrollok(stdscr, TRUE);
@@ -93,10 +96,14 @@ void game::drawstart() const{
             for(int16_t j = -1; j <= bsize; j++){
                 if(j == -1 || j == bsize || i == -1 || i == bsize) {
                     attron(COLOR_WALL);
-                    printw("WW");
+                    printw("  ");
                     attroff(COLOR_WALL);
                 }
-                else printw("  ");
+                else {
+                    attron(COLOR_EMPTY);
+                    printw("%c%c", EMPTY_CHAR, EMPTY_CHAR);
+                    attroff(COLOR_EMPTY);
+                }
             }
             printw("\n");
         }
@@ -111,15 +118,17 @@ void game::draw_xy(int x, int y, unsigned int c) const {
 }
 
 void game::draw() const{
-    draw_xy(headx, heady, 'H' | COLOR_SNAKEHEAD);
+    draw_xy(headx, heady, ' ' | COLOR_SNAKEHEAD);
     auto& ccell = board[prevheady][prevheadx];
-    char c = ' ';
+    char c = EMPTY_CHAR;
+    auto color = COLOR_SNAKETAIL;
     if(ccell.val > 0){
         c = '=';
         if(ccell.is_corner) c = ':';
         else if (ccell.is_vertical) c = '|';
     }
-    draw_xy(prevheadx, prevheady, c | COLOR_SNAKETAIL);
+    else color = COLOR_EMPTY;
+    draw_xy(prevheadx, prevheady, c | color);
     refresh();
 }
 
@@ -134,7 +143,7 @@ void game::regress(){
             if(board[i][j].has_apple) continue;
             if(i == heady && j == headx) continue;
             if(board[i][j].val == 1) {
-                draw_xy(j, i, ' ');
+                draw_xy(j, i, EMPTY_CHAR | COLOR_EMPTY);
                 board[i][j].val = 0;
                 continue;
             }
@@ -304,6 +313,10 @@ enum game::DIRECTION game::getdir(){
         case 'd':
         case 'D':
             return RIGHT;
+        case '[':
+            return (enum DIRECTION)((direction + 1) % 4);
+        case ']':
+            return (enum DIRECTION)((direction + 3) % 4);
         case 'p':
         case 'P':
             paused = true;
@@ -333,7 +346,7 @@ void game::place_apple(){
                 board[i][j].has_apple = true;
                 appxdbg = j;
                 appydbg = i;
-                draw_xy(appxdbg, appydbg, 'A' | COLOR_APPLE);
+                draw_xy(appxdbg, appydbg, ' ' | COLOR_APPLE);
                 return;
             }
             if(board[i][j].val == 0) pos--;
