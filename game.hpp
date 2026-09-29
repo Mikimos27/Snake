@@ -5,7 +5,7 @@
 
 class game{
 public:
-    game(uint16_t, bool, bool, bool);
+    game(uint16_t, bool, bool, bool, bool&);
     ~game();
 
     void start(uint16_t time);
@@ -57,6 +57,7 @@ private:
     const bool hidewalls;
 
     bool paused;
+    bool& doloop;
 
     uint16_t appxdbg = 0;
     uint16_t appydbg = 0;

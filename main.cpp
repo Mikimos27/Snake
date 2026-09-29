@@ -38,7 +38,7 @@ int main(int argc, char** argv){
     }
 
     {
-        game g(width, wrap, hidewalls, startpaused);
+        game g(width, wrap, hidewalls, startpaused, loopondeath);
         do{
             g.start(timems);
             score = g.get_score();
