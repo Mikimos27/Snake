@@ -41,7 +41,8 @@ int main(int argc, char** argv){
         game g(width, wrap, hidewalls, startpaused, loopondeath);
         do{
             g.start(timems);
-            score = g.get_score();
+            int nscore = g.get_score();
+            score = nscore > score ? nscore : score;
             if(loopondeath) g.reset();
             else break;
         }while(1);
