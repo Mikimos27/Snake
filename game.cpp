@@ -133,12 +133,12 @@ void game::regress(){
         for(uint8_t j = 0; j < bsize; j++){
             if(board[i][j].has_apple) continue;
             if(i == heady && j == headx) continue;
-            if(board[i][j].val <= 1) {
+            if(board[i][j].val == 1) {
                 draw_xy(j, i, ' ');
                 board[i][j].val = 0;
                 continue;
             }
-            board[i][j].val--;
+            if(board[i][j].val > 0) board[i][j].val--;
         }
     }
 }
