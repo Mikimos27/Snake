@@ -48,6 +48,6 @@ int main(int argc, char** argv){
         }while(1);
     }
     std::cout << "Score: " << score << '\n';
-    if(score == width * width - 1) std::cout << "WIN\n";
+    if(score >= width * width - 1) std::cout << "WIN\n";
     return 0;
 }
