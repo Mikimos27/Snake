@@ -35,14 +35,14 @@ game::game(uint16_t n, bool wrap, bool hidewalls, bool paused, bool& doloop)
     : board(new Cell*[n]), bsize(n), score(0), score_to_add(0), headx(n / 2), heady(n / 2), prevheadx(headx), prevheady(heady), direction(DOWN), wrap(wrap), hidewalls(hidewalls), paused(paused), doloop(doloop) {
     std::srand(std::time(NULL));
     if(!board) exit(1);
-    for(uint8_t i = 0; i < n; i++){
+    for(uint16_t i = 0; i < n; i++){
         board[i] = new Cell[n];
         if(!board[i]) exit(1);
     }
     init_getch();
 }
 game::~game(){
-    for(uint8_t i = 0; i < bsize; i++){
+    for(uint16_t i = 0; i < bsize; i++){
         delete[] board[i];
     }
     delete[] board;
@@ -138,8 +138,8 @@ void game::regress(){
         score_to_add--;
         return;
     }
-    for(uint8_t i = 0; i < bsize; i++){
-        for(uint8_t j = 0; j < bsize; j++){
+    for(uint16_t i = 0; i < bsize; i++){
+        for(uint16_t j = 0; j < bsize; j++){
             if(board[i][j].has_apple) continue;
             if(i == heady && j == headx) continue;
             if(board[i][j].val == 1) {
