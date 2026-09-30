@@ -11,8 +11,8 @@ int main(int argc, char** argv){
         filename = argv[1];
     }
     uint16_t score = 0;
-    uint16_t width = 16;
-    uint16_t timems = 180;
+    uint16_t width = 32;
+    uint16_t timems = 60;
     bool wrap = false;
     bool hidewalls = false;
     bool loopondeath = false;
@@ -26,7 +26,7 @@ int main(int argc, char** argv){
         if(file >> out) hidewalls = out;
         if(file >> out) loopondeath = out;
         if(file >> out) startpaused = out;
-    } else{
+    } else if(argc > 1) {
         file.close();
         std::ofstream makefile(filename);
         makefile << width << '\n';
