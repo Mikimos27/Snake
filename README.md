@@ -26,3 +26,5 @@ Options file:
 Game:
  - Arrows to change direction
  - 'p' to pause
+ - 'q' to quit
+ - '\[', '\]' to rotate
